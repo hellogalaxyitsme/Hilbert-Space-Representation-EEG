@@ -1,0 +1,7 @@
+{
+  "bci2a_root": "/path/to/BCI_IV_2a",
+  "sleepedf_root": "/path/to/sleep-cassette",
+  "seediv_root": "/path/to/SEED-IV",
+  "p300_root": "/path/to/BNCI2014-009",
+  "output_root": "./results"
+}

@@ -1,0 +1,24 @@
+{
+  "archive_version": "0.2.0",
+  "created": "2026-09-27",
+  "empirical_estimator": {
+    "name": "historical_unanchored_odi",
+    "normalization": "max(flattened_response_norm, 1e-12)",
+    "pair_policy": "all off-diagonal absolute cosines",
+    "zero_input_subtraction": false,
+    "zero_response_log": false
+  },
+  "anchored_estimator": {
+    "name": "anchored_band_orthogonality_report",
+    "response": "phi(component) - phi(zero)",
+    "near_zero_policy": "exclude anchored response norms <= eps"
+  },
+  "aggregate_inputs": [
+    "results/primary_contrasts.csv",
+    "results/cka_odi_dissociation_summary.csv",
+    "results/taxonomy_oos_sign_summary.csv",
+    "results/tier3_arm4_vs_arm2_summary.csv"
+  ],
+  "not_distributed": ["raw EEG", "checkpoints", "credentials", "manuscript sources", "figure-production files"],
+  "license": "UNLICENSED by author decision"
+}

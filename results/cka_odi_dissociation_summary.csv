@@ -1,0 +1,2 @@
+scope,n_pairs,selection,cka_abs_diff_median,cka_abs_diff_median_ci_low,cka_abs_diff_median_ci_high,odi_abs_diff_median,odi_abs_diff_median_ci_low,odi_abs_diff_median_ci_high,val_acc_abs_diff_median,val_acc_abs_diff_median_ci_low,val_acc_abs_diff_median_ci_high
+constructed_cka_odi_dissociation,250,CKA-input nearly matched while ODI and validation accuracy diverge,0.0012065631687574324,0.0010997461542624626,0.0014284383645393264,0.27504564911339724,0.2667332221934373,0.29941087141079686,0.0695,0.06024999999999997,0.08499999999999999

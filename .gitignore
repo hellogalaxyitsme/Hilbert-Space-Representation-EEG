@@ -1,0 +1,29 @@
+# Python build and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Local execution outputs and release bundles
+outputs/
+*.zip
+
+# Restricted data and model artifacts
+rawdata/
+data/
+prepared/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.edf
+
+# Local credentials and machine configuration
+.env
+*.key
+*.pem
+id_*
+config.local.json
+paths.local.json
