@@ -1,0 +1,3 @@
+analysis,optimizer,lr,weight_decay,batch,epochs,checkpoints,source
+supervised dynamics,AdamW,.001,.0001,requested 64; cap 32 for EEG-Conformer/TSception/ATCNet,BCI 30; Sleep/SEED/P300 20,task_protocols.csv,launcher configuration plus archived report run metadata
+BCI regularizer,AdamW,.001,.0001,recorded 32 or 64; regularizer batch 4,30,final checkpoint plus endpoint reports,180 persisted tier3 JSON records

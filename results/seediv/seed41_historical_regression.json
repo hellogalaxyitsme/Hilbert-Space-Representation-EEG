@@ -1,0 +1,35 @@
+{
+  "historical_csv": "C:\\Users\\Shriya\\Desktop\\EEG Hilbert Space\\submission_work\\audit_results\\seediv_paired_raw_anchored_seed41_64.csv",
+  "historical_rows": 68,
+  "new_seed41_endpoint_rows": 68,
+  "matched_rows": 68,
+  "historical_only_rows": 0,
+  "new_only_rows": 0,
+  "max_raw_abs_error": 3.873169890933337e-05,
+  "max_anchored_abs_error": 0.001241934431216396,
+  "raw_comparison_tolerance": 0.0001,
+  "anchored_comparison_tolerance": 0.002,
+  "raw_within_tolerance": true,
+  "anchored_within_tolerance": true,
+  "eegconformer_patch_endpoints": [
+    {
+      "epoch": 0,
+      "raw_odi_old": 0.9704076931558572,
+      "raw_odi_new": 0.9704076933239,
+      "anchored_odi_old": 0.1037221036899166,
+      "anchored_odi_new": 0.1037255867353789,
+      "raw_abs_error": 1.6804280189575138e-10,
+      "anchored_abs_error": 3.4830454622991613e-06
+    },
+    {
+      "epoch": 20,
+      "raw_odi_old": 0.6778590634648732,
+      "raw_odi_new": 0.6778590602577073,
+      "anchored_odi_old": 0.1830579833637151,
+      "anchored_odi_new": 0.1830585062803757,
+      "raw_abs_error": 3.2071659772370253e-09,
+      "anchored_abs_error": 5.229166606113278e-07
+    }
+  ],
+  "interpretation": "Numerical regression, not bit identity: the lab used CUDA float32 with cuDNN TF32 enabled for cuDNN; the historical CSV was retained locally and never sent to the lab."
+}

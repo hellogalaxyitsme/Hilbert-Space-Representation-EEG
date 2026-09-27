@@ -1,0 +1,6 @@
+null_family,quantity,match_rule,record_fields,source
+dimension-matched random projection,expected/random-vector ODI and gaussian simulated ODI,output dimensionality per layer,expected_odi_random_vectors; gaussian_null_odi_mean/std,reports/tier2_matched_nulls_ckpt_extended/*.json
+matched null,matched_null_odi_mean,recorded per layer/checkpoint; implementation must be traced before formula claim,matched_null_odi_mean; delta_odi_vs_matched_null,reports/tier2_matched_nulls_ckpt_extended/*.json
+orthogonal projection,orthogonal_null_odi_mean/std,recorded per layer output dimension,orthogonal_null_odi_mean/std,reports/tier2_matched_nulls_ckpt_extended/*.json
+PCA,pca_null_odi_mean/std,recorded per layer output dimension,pca_null_odi_mean/std,reports/tier2_matched_nulls_ckpt_extended/*.json
+untrained same architecture,untrained_same_arch_odi_mean/std,same architecture/layer/checkpoint context,untrained_same_arch_odi_mean/std; delta_odi_vs_untrained,reports/tier2_matched_nulls_ckpt_extended/*.json

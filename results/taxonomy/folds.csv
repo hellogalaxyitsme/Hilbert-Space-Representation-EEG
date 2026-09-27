@@ -1,0 +1,11 @@
+evaluation_scope,split_id,heldout_dataset,heldout_seeds,train_scope,heldout_scope,n_taxonomy_trajectories,n_all_predictor_rows,record
+leave_dataset_out,heldout_dataset=bci2a,bci2a,41;42;43;44;45;46,sleepedf_full+seediv+p300,bci2a,300,900,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_dataset_out,heldout_dataset=p300,p300,41;42;43;44;45;46,bci2a+sleepedf_full+seediv,p300,240,720,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_dataset_out,heldout_dataset=seediv,seediv,41;42;43;44;45;46,bci2a+sleepedf_full+p300,seediv,300,900,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_dataset_out,heldout_dataset=sleepedf_full,sleepedf_full,41;42;43;44;45;46,bci2a+seediv+p300,sleepedf_full,300,900,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=41,bci2a;p300;seediv;sleepedf_full,41,all_datasets|all_other_seeds,41,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=42,bci2a;p300;seediv;sleepedf_full,42,all_datasets|all_other_seeds,42,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=43,bci2a;p300;seediv;sleepedf_full,43,all_datasets|all_other_seeds,43,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=44,bci2a;p300;seediv;sleepedf_full,44,all_datasets|all_other_seeds,44,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=45,bci2a;p300;seediv;sleepedf_full,45,all_datasets|all_other_seeds,45,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv
+leave_seed_out,heldout_seed=46,bci2a;p300;seediv;sleepedf_full,46,all_datasets|all_other_seeds,46,190,570,reviewer_code/results/taxonomy_oos_sign_predictions.csv

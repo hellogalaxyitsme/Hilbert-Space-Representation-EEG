@@ -1,0 +1,2 @@
+analysis,rows,reduced_predictors,added_predictor,r2_reduced,r2_full,delta_r2,ci_low,ci_high,draws,resampling_unit,source
+true_label_primary_clean,7140,CKAinput;RSAinput;RSAlabel;log1p_activation_rank;fixed_dataset_arch_mode_seed_operation_group,rawODI,.7484751388,.7502083934,.0017332546,.0004372722,.0047903812,1000,dataset|arch|mode|seed cluster; pooled cluster draws,reports/tnnls_tier1/variance_partitioning_rows.csv; scripts/run_tnnls_tier1_analyses.py

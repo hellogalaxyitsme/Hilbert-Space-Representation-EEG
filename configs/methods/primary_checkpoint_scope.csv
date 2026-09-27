@@ -1,0 +1,2 @@
+﻿analysis,training,evaluation,audit_pool,geometry_unit,record_source,checkpoint_row_scope
+supervised_primary,task-specific recorded splits,task-specific recorded validation split,historical raw-ODI sampled each task's full cache; CKA/RSA used recorded validation pools (BCI 288, Sleep 384, SEED 384, P300 144),isolated band response per layer/checkpoint,results/taxonomy/joined_layer_checkpoint_metrics.csv (distributed relative reference),14280 rows after P300/ATCNet exclusion; 7140 true-label rows; BCI4200 Sleep3600 SEED3600 P3002880 both modes

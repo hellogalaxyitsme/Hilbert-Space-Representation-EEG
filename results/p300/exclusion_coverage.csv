@@ -1,0 +1,3 @@
+scope,n_window_layer_rows,raw_floor_pair_count_total,anchor_excluded_pair_count_total,excluded_bands_total,description
+full_paired_audit,61184,0,0,0,All retained P300 window-layer rows; anchored active bands use residual norm > eps.
+eegconformer_patch_embedding,2304,0,0,0,Fixed named hook across six seeds and six checkpoints.

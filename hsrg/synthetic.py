@@ -1,4 +1,4 @@
-"""Synthetic EEG-like signals for definition hardening."""
+"""Synthetic EEG-like signals for deterministic estimator demonstrations."""
 
 from __future__ import annotations
 

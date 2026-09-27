@@ -1,49 +1,47 @@
 # Hilbert-Space Representation Geometry in EEG Neural Networks
 
-This project uses Hilbert-space geometry to study how neural-network layers transform orthogonal spectral components of EEG. By decomposing each input into disjoint frequency bands and tracking their representations, it measures changes in component alignment, pairwise distances, and layerwise geometry during training.
+This release contains analysis code and compact aggregate records for a study of how EEG-network layers transform disjoint spectral components. It provides the primary raw Orthogonality Distortion Index (raw ODI), a zero-anchored paired sensitivity, fixed-fold taxonomy summaries, and an analytic Gaussian dimension reference.
 
-The analysis covers EEGNet, ShallowConvNet, EEG-Conformer, TSception, and ATCNet across motor imagery (BCI IV-2a), sleep staging (Sleep-EDF), emotion recognition (SEED-IV), and P300 decoding. It combines the Orthogonality Distortion Index (ODI), controlled reference experiments, and comparisons with centered kernel alignment (CKA) and representational similarity analysis (RSA) to characterize architecture-dependent representation behavior.
+## Included analyses
 
-## What is included
+- `hsrg/geometry.py` implements raw ODI over every off-diagonal pair, using `max(norm_i, eps) * max(norm_j, eps)`.
+- `hsrg/audit_metrics.py` provides the raw/anchored paired estimator and signed baseline, cross, and residual decomposition. The signed terms reconstruct signed raw cosine; absolute ODI is not their sum.
+- `pipelines/run_p300_paired_audit.py` is the fixed-hook P300 audit. It uses 64 fixed class-balanced held-out windows and fixed named layers at every checkpoint.
+- `scripts/taxonomy_exclude_dataset_sensitivity.py` refits leave-dataset-out predictions from locally available trajectory records. It validates inventory membership, mappings, duplicate keys, empty folds, and bootstrap inputs.
+- `scripts/reproduce_taxonomy_bootstrap.py` reruns compact four-task and three-task paired bootstrap inputs without EEG or weights.
+- `scripts/reaggregate_analytic_gaussian_null.py` aggregates the supplied 4,644 canonical records using raw ODI minus alpha_d, the analytic Gaussian expectation.
 
-- Finite-dimensional HSRG estimators, deterministic controls, and geometry unit tests.
-- Training, evaluation, and aggregation pipelines for the archived EEG analyses.
-- Compact aggregate result tables and provenance records.
-- A bounded paired SEED-IV checkpoint audit that compares the historical unanchored measure with the separate zero-anchored measure.
-- Dependency files for installation and the exact eight-package environment record used for the clean lab validation.
-
-## Quick start
+## Reproduce compact numerical summaries
 
 ```powershell
 python -m pip install -r requirements.txt
-python scripts/run_synthetic_hsrg.py --out outputs/synthetic_reference.json
 python -m unittest discover -s tests -v
-python scripts/smoke_five_architectures.py
-python scripts/cluster_taxonomy_bootstrap.py --input results/taxonomy_oos_sign_predictions.csv --out outputs/cluster_bootstrap.csv
+python scripts/summarize_p300_paired.py --input results/p300/fixed_hook_layer_seed.csv --out outputs/p300_fixed_hook_summary.csv
+python scripts/reproduce_taxonomy_bootstrap.py --input results/taxonomy/four_task_predictions.csv --out outputs/four_task_bootstrap.csv
+python scripts/reproduce_taxonomy_bootstrap.py --input results/taxonomy/three_task_excluding_sleep_predictions.csv --out outputs/three_task_bootstrap.csv
+python scripts/taxonomy_exclude_dataset_sensitivity.py --joined results/taxonomy/joined_layer_checkpoint_metrics.csv --taxonomy results/taxonomy/architecture_taxonomy_layer_rows.csv --datasets bci2a,seediv,p300 --out outputs/refit_predictions.csv --summary outputs/refit_summary.csv --fold-table outputs/refit_folds.csv --draws 5000 --seed 20260927
+python scripts/reaggregate_analytic_gaussian_null.py --input results/gaussian/analytic_gaussian_rows.csv --summary outputs/analytic_gaussian_summary.csv
+python scripts/reproduce_regularizer_ci.py --input results/regularizer/tier3_arm4_vs_arm2_pairs.csv --out outputs/regularizer_ci.csv
+python scripts/validate_seediv_audit.py --summary results/seediv/expanded_audit_summary.json --coverage results/seediv/checkpoint_coverage.csv --fixed-hooks results/seediv/fixed_hook_seed_layer_checkpoint_summary.csv
+python scripts/summarize_seediv_expanded_audit.py --input results/seediv/fixed_hook_seed_layer_checkpoint_summary.csv --out outputs/seediv_summary.csv
+# The cache must contain one non-overlapping 4 s (800-sample at 200 Hz) window per trial.
+python pipelines/run_seediv_expanded_audit.py --cache path/to/seediv_audit_4s_onewindow.npz --checkpoints path/to/seediv_checkpoints --out outputs/seediv_expanded
 ```
 
-The synthetic runner is deterministic for a fixed seed. It exercises identity, linear, ReLU, and deliberate band-mixing maps and reports scale-adjusted pairwise geometry and component coherence. The five-architecture command performs CPU forward and one-step optimizer checks. The bootstrap command uses the packaged out-of-sample prediction rows and writes a dataset-stratified, run-cluster summary.
+The fixed four-task taxonomy analysis reports 0.853352 taxonomy accuracy and 0.598196 training-only-majority accuracy, with paired difference 0.255156 [0.186345, 0.328171] across 1,140 rows and 114 run clusters. The Sleep-excluded refit reports 0.823260 and 0.580391, difference 0.242869 [0.161586, 0.329444], across 840 rows and 84 clusters. The latter excludes Sleep from both fitting and evaluation; it does not remove the historical Sleep training/validation-recording overlap limitation.
 
-## Measures and interpretation
+The P300 paired sensitivity covers 142 of 144 expected architecture/seed/checkpoint combinations. EEGNet, ShallowConvNet, and EEG-Conformer have all six seeds at epochs 0, 1, 2, 5, 10, and 20. TSception lacks seed 46 at epochs 10 and 20. For the fixed EEG-Conformer `patch_embedding` hook, mean raw ODI changed from 0.943625 at epoch 0 to 0.598648 at epoch 20, while mean anchored ODI changed from 0.155103 to 0.268836; all six seed-level changes have opposite raw and anchored directions. `results/p300/exclusion_coverage.csv` records zero raw-floor and anchored-exclusion counts for the retained full P300 rows and for that hook.
 
-`hsrg.geometry` provides `pairwise_isometry_report`, `band_orthogonality_report`, and `local_directional_distortion`. A sampled epoch is treated as a finite-dimensional approximation to an EEG signal, with `dt` controlling Riemann-sum norm scaling.
+For local P300 inference, pass `--skip-missing` when requesting the recorded 142-checkpoint scope so the two unavailable TSception seed-46 late checkpoints are recorded in `p300_checkpoint_coverage.json` before any inference starts. Each completed checkpoint is written to `checkpoint_shards/` and merged on a later invocation.
 
-Historical aggregate rows use the unanchored ODI procedure: isolated band responses are compared directly with an epsilon norm denominator. `hsrg.geometry.anchored_band_orthogonality_report` is a distinct estimator that subtracts the zero-input response and records near-zero exclusions. Do not combine the two estimators in a single historical trajectory.
+## Inputs, scope, and limits
 
-HSRG is a descriptive representation measure, not a universal quality score or evidence that one geometry is optimal for every task.
+The expanded SEED-IV audit evaluated 180 checkpoints across five architectures, six seeds, and epochs 0, 1, 2, 5, 10, and 20. It retained 34 fixed named hooks, yielding 1,224 seed/layer/checkpoint summaries from 78,336 window rows; the row-level input is not distributed. All raw-floor and anchored-exclusion counts were zero and the largest signed reconstruction error was `9.094947017729282e-13`. At EEG-Conformer `patch_embedding`, raw ODI changed from `0.9702841371276435` to `0.7114471819012422`, while anchored ODI changed from `0.09515090464100821` to `0.1645733005233228`. Raw ODI fell for all six seeds; anchored ODI rose for five, while seed 45 changed by `-0.006008108104795198`. These are observed audit differences and do not establish a training mechanism.
 
-## Paired SEED-IV checkpoint audit
+Compact aggregate records and reproducible analysis code are included. Re-running P300 or SEED-IV inference requires data obtained under the provider terms and compatible local checkpoints. The SEED-IV audit expects the documented 200 Hz, one 4-second window-per-trial cache, all 180 compatible checkpoint files in the documented directory layout, and a CUDA-capable PyTorch installation; those scientific inputs are not redistributed. Resume metadata binds each shard to the cache and checkpoint digests, selected windows, fixed hooks, batch setting, and CUDA/PyTorch runtime.
 
-`pipelines/audit_seediv_checkpoints.py` reproduces the bounded paired audit when supplied with a compatible locally prepared SEED-IV cache and saved `seediv_*_dynamics_true_seed41_checkpoints/*epoch_0[02]0.pt` files. The script fixes seed 41 and selects up to 16 held-out windows from each of four classes, for at most 64 windows. It evaluates epoch 0 and epoch 20 on CPU or CUDA and writes raw ODI, anchored ODI, their difference, near-zero rate, and selected indices.
+The regularizer records describe a feature-centered smooth surrogate with epsilon `1e-8`, batch size 4, application every fourth batch, HSRG lambda 0.05, weight orthogonality penalty 0.0001, band noise 0.25 per validation epoch, channel/time standard-deviation normalization, and dropout 0.25 under eight masks shared across validation epochs. The authoritative initial-sweep intervals are in `results/regularizer/authoritative_ci.csv`.
 
-```powershell
-python pipelines/audit_seediv_checkpoints.py --cache prepared/seediv_audit_4s_onewindow.npz --checkpoints . --out outputs/seediv_paired_raw_anchored.csv --device cpu
-```
+Historical Tier-2 artifact fields remain available for reproduction. Their high-dimensional `gaussian_projection_odi` branch returns the input ODI, and the routine named `orthogonal_projection_odi` uses a Rademacher sign sketch without QR factorization. `results/gaussian/null_family_definitions.csv` preserves their original meanings. The analytic Gaussian reference is the primary dimension-only comparison in this release.
 
-`results/seediv_paired_raw_anchored_seed41_64.csv` is the exact 64-window, 68-summary output used for the paired sensitivity. The study is limited to the available SEED-IV seed-41 checkpoints; it does not generalize an anchored pattern to the other tasks.
-
-## Real-data pipelines and access
-
-Obtain each source dataset under its distributor terms. The available cache-preparation entry points are `pipelines/prepare_p300_cache.py`, `pipelines/prepare_seediv_cache.py`, and `pipelines/prepare_sleepedf_cache.py`; BCI IV-2a is loaded by its training scripts. Supervised architecture audits are exposed through `train_bci2a_arch_layer_audit.py`, `train_p300_arch_layer_audit.py`, `train_seediv_arch_layer_audit.py`, and `train_sleepedf_arch_layer_audit.py`. Dataset locations are supplied through command-line arguments; `configs/paths.example.json` is illustrative and is not read automatically.
-
-Raw EEG, trained weights, credentials, local host paths, article sources, and figure-production scripts are not included. The original project code is intentionally UNLICENSED. Third-party components are not redistributed beyond their documented runtime dependencies. See `docs/REPRODUCIBILITY_MAP.md` for the available artifacts and reproduction limits.
+The original project code is intentionally UNLICENSED. Runtime dependencies retain their own licenses; see `THIRD_PARTY_NOTICES.md`.

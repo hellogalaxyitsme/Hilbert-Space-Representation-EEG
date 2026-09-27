@@ -1,0 +1,4 @@
+evaluation_scope,heldout_dataset,fit_datasets,n_train_trajectories,n_test_trajectories,n_taxonomy_keys_fitted,training_only_global_majority,excluded_dataset
+leave_dataset_out,bci2a,seediv+p300,540,300,17,-1,sleepedf_full
+leave_dataset_out,seediv,bci2a+p300,540,300,17,-1,sleepedf_full
+leave_dataset_out,p300,bci2a+seediv,600,240,17,-1,sleepedf_full

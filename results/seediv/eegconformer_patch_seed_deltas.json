@@ -1,0 +1,38 @@
+{
+  "n_rows": 1224,
+  "n_arch_seed_epoch_layer": 1224,
+  "patch_seed_deltas": [
+    {
+      "seed": 41,
+      "raw_epoch20_minus0": -0.2925486330661927,
+      "anchored_epoch20_minus0": 0.0793329195449968
+    },
+    {
+      "seed": 42,
+      "raw_epoch20_minus0": -0.25719655982673706,
+      "anchored_epoch20_minus0": 0.0848956665381426
+    },
+    {
+      "seed": 43,
+      "raw_epoch20_minus0": -0.24211779759183327,
+      "anchored_epoch20_minus0": 0.08381701066206419
+    },
+    {
+      "seed": 44,
+      "raw_epoch20_minus0": -0.2485963229488204,
+      "anchored_epoch20_minus0": 0.0964555612175178
+    },
+    {
+      "seed": 45,
+      "raw_epoch20_minus0": -0.24614700704551928,
+      "anchored_epoch20_minus0": -0.006008108104795198
+    },
+    {
+      "seed": 46,
+      "raw_epoch20_minus0": -0.2664154108793051,
+      "anchored_epoch20_minus0": 0.07804132543596139
+    }
+  ],
+  "patch_raw_decrease_all6": true,
+  "patch_anchor_increase_n": 5
+}

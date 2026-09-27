@@ -1,0 +1,20 @@
+{
+  "python": "3.10.12 (main, Nov  4 2025, 08:48:33) [GCC 11.4.0]",
+  "torch": "2.9.1+cu128",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "cuda_device": "NVIDIA RTX A5000",
+  "cuda_device_capability": [
+    8,
+    6
+  ],
+  "cuda_matmul_allow_tf32": false,
+  "cudnn_allow_tf32": true,
+  "cudnn_deterministic": false,
+  "cudnn_benchmark": false,
+  "batched_single_rows": 68,
+  "batched_single_raw_max_abs_error": 2.401035233157156e-05,
+  "batched_single_anchor_max_abs_error": 0.0001089628287315,
+  "batched_single_overall_max_abs_error": 0.0001089628287315,
+  "batch_single_tolerance": 0.0002
+}

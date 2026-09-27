@@ -1,0 +1,17 @@
+{
+  "dataset": "seediv",
+  "cache_filename": "seediv_audit_4s_onewindow.npz",
+  "sampling_rate_hz": 200,
+  "epoch_duration_seconds": 4,
+  "windows_per_trial": 1,
+  "heldout_subjects": "13,14,15",
+  "heldout_window_pool": 216,
+  "heldout_windows_per_class": 54,
+  "selected_windows": 64,
+  "selected_windows_per_class": 16,
+  "selection": "numpy.default_rng(41), choose 16 without replacement per class, then sort validation indices",
+  "epsilon": 1e-12,
+  "raw_denominator": "max(norm_i, eps) * max(norm_j, eps)",
+  "anchored_active_rule": "residual norm > eps",
+  "fixed_hook_rule": "historical compact named hooks at every checkpoint; output equality is metadata only"
+}

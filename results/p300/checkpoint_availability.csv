@@ -1,0 +1,7 @@
+analysis,architecture,seed,epoch,availability,reason
+p300_fixed_hook,eegnet,41-46,0;1;2;5;10;20,available,36 of 36 architecture-seed-checkpoint combinations
+p300_fixed_hook,shallowconvnet,41-46,0;1;2;5;10;20,available,36 of 36 architecture-seed-checkpoint combinations
+p300_fixed_hook,eegconformer,41-46,0;1;2;5;10;20,available,36 of 36 architecture-seed-checkpoint combinations
+p300_fixed_hook,tsception,41-46,0;1;2;5,available,24 of 24 architecture-seed-checkpoint combinations
+p300_fixed_hook,tsception,41-45,10;20,available,10 of 10 architecture-seed-checkpoint combinations
+p300_fixed_hook,tsception,46,10;20,missing,Local late checkpoint files were unavailable.

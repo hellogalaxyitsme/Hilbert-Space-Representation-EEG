@@ -121,6 +121,12 @@ def gaussian_projection_odi(
     *,
     simulation_max_dim: int,
 ) -> float:
+    """Historical finite simulation; high dimensions return the input ODI.
+
+    The high-dimensional identity branch preserves legacy artifact values. It
+    is not an analytic Gaussian expectation; use ``random_vector_expected_abs_cos``
+    for the closed-form reference.
+    """
     if out_dim >= simulation_max_dim:
         return odi_from_features(x_flat)
     gram = x_flat @ x_flat.T
@@ -138,14 +144,18 @@ def orthogonal_projection_odi(
     *,
     simulation_max_dim: int,
 ) -> float:
+    """Historical Rademacher-sign sketch with identity approximation branches.
+
+    Despite its retained artifact key, this routine does not QR-orthogonalize
+    a projection matrix. It returns input ODI when output dimension reaches
+    the input dimension or the simulation cap.
+    """
     in_dim = x_flat.shape[1]
     if out_dim >= in_dim:
         return odi_from_features(x_flat)
     if out_dim >= simulation_max_dim:
         return odi_from_features(x_flat)
-    # A signed semi-orthogonal sketch is the fast finite-dimensional surrogate
-    # for a random projection when out_dim is small. QR on the full EEG input
-    # dimension is prohibitively slow inside the layer/checkpoint loop.
+    # Rademacher sign sketch retained for historical reproducibility.
     sketch = rng.choice((-1.0, 1.0), size=(in_dim, max(out_dim, 1))) / math.sqrt(max(out_dim, 1))
     return odi_from_features(x_flat @ sketch)
 

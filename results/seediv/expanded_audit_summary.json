@@ -1,0 +1,45 @@
+{
+  "expected_checkpoints": 180,
+  "observed_checkpoints": 180,
+  "coverage_all_64_windows": true,
+  "coverage_unique_hashes": 180,
+  "per_window_rows": 78336,
+  "fixed_hook_rows": 1224,
+  "hooks_per_arch": {
+    "atcnet": 7,
+    "eegconformer": 6,
+    "eegnet": 7,
+    "shallowconvnet": 6,
+    "tsception": 8
+  },
+  "all_rows_aggregation_included": true,
+  "raw_floor_band_events": 0,
+  "raw_floor_pair_events": 0,
+  "anchor_excluded_band_events": 0,
+  "anchor_excluded_pair_events": 0,
+  "signed_reconstruction_max_abs_error": 9.094947017729282e-13,
+  "signed_reconstruction_p99_abs_error": 2.8310687127941492e-14,
+  "eegconformer_patch": {
+    "raw_odi": {
+      "epoch0_mean": 0.9702841371276435,
+      "epoch0_sd": 0.008195247821264837,
+      "epoch20_mean": 0.7114471819012422,
+      "epoch20_sd": 0.017698947110142364,
+      "delta_mean": -0.2588369552264013,
+      "delta_sd": 0.018665672643715738
+    },
+    "anchored_odi": {
+      "epoch0_mean": 0.09515090464100821,
+      "epoch0_sd": 0.018975128993476448,
+      "epoch20_mean": 0.1645733005233228,
+      "epoch20_sd": 0.028526858667962805,
+      "delta_mean": 0.0694223958823146,
+      "delta_sd": 0.03752248505937479
+    }
+  },
+  "eegconformer_patch_raw_decrease_all6": true,
+  "eegconformer_patch_anchor_increase_count": 5,
+  "minimum_anchored_response_norm_global": 1.8225771011615582e-06,
+  "minimum_anchored_response_norm_eegconformer_patch": 0.0014125620558389515,
+  "minimum_anchored_response_norm_table": "seediv_fixed_hook_min_anchored_response_norm.csv"
+}

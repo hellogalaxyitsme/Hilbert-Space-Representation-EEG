@@ -1,0 +1,41 @@
+dataset,architecture,label_mode,seed_checkpoint_dirs,seed_ids,checkpoint_epochs,status,archival_json_reports,reported_audit_epochs
+bci2a,eegnet,true,0,,,inspect legacy/nonstandard directory,0,
+bci2a,eegnet,shuffled,0,,,inspect legacy/nonstandard directory,0,
+bci2a,shallowconvnet,true,0,,,inspect legacy/nonstandard directory,0,
+bci2a,shallowconvnet,shuffled,0,,,inspect legacy/nonstandard directory,0,
+bci2a,eegconformer,true,0,,,inspect legacy/nonstandard directory,0,
+bci2a,eegconformer,shuffled,0,,,inspect legacy/nonstandard directory,0,
+bci2a,tsception,true,0,,,inspect legacy/nonstandard directory,0,
+bci2a,tsception,shuffled,0,,,inspect legacy/nonstandard directory,0,
+bci2a,atcnet,true,0,,,inspect legacy/nonstandard directory,0,
+bci2a,atcnet,shuffled,0,,,inspect legacy/nonstandard directory,0,
+sleepedf_full,eegnet,true,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,eegnet,shuffled,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,shallowconvnet,true,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,shallowconvnet,shuffled,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,eegconformer,true,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,eegconformer,shuffled,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,tsception,true,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,tsception,shuffled,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,atcnet,true,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+sleepedf_full,atcnet,shuffled,6,41;42;43;44;45;46,,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,eegnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,eegnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,shallowconvnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,shallowconvnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,eegconformer,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,eegconformer,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,tsception,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,tsception,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,atcnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+seediv,atcnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,eegnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,eegnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,shallowconvnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,shallowconvnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,eegconformer,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,eegconformer,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,tsception,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,tsception,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,atcnet,true,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
+p300,atcnet,shuffled,6,41;42;43;44;45;46,0;1;2;5;10;20,complete reports: six seeds x six audit checkpoints,6,0;1;2;5;10;20
