@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build task-specific chance/balance calibration checks for paper reporting."""
+"""Build task-specific chance and balance calibration checks."""
 
 from __future__ import annotations
 
@@ -328,7 +328,7 @@ def write_summary(out_dir: Path, dataset_rows: list[dict[str, Any]], perf_rows: 
         "## Interpretation",
         "",
         "- BCI IV 2a, Sleep-EDF full, and SEED-IV validation sets are balanced in the report metadata, so chance equals the validation majority baseline.",
-        "- P300 is raw-imbalanced, but the reported validation protocol is balanced; the validation metric is balanced P300 accuracy rather than raw event-majority accuracy.",
+        "- P300 uses a balanced validation protocol, so the validation metric is balanced P300 accuracy. Raw event-majority accuracy describes the unbalanced event distribution.",
         "- Shuffled-label and untrained-head/control gaps should be reported alongside chance margins to avoid overstating small above-chance differences.",
     ]
     (out_dir / "calibration_checks_summary.md").write_text("\n".join(lines) + "\n")

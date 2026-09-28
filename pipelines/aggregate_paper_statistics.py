@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add multiple-comparison correction and effect sizes to paper-facing tests."""
+"""Calculate multiple-comparison corrections and effect sizes for paired tests."""
 
 from __future__ import annotations
 
@@ -135,7 +135,7 @@ def main() -> None:
     write_csv(out_dir / "paper_focused_effect_tests.csv", focus)
 
     lines = [
-        "# Paper-Level Statistical Corrections and Effect Sizes",
+        "# Statistical Corrections and Effect Sizes",
         "",
         "Corrections are applied within each test family: supervised DL metrics and frozen-FM metrics.",
         "",

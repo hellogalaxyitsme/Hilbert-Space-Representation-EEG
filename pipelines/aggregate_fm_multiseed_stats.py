@@ -264,7 +264,7 @@ def main() -> None:
         "",
         "## Notes",
         "",
-        "- These are frozen pretrained FM encoder + linear-probe results, not full fine-tuning results.",
+        "- These results use a frozen pretrained FM encoder with a linear probe. Full fine-tuning was outside this evaluation.",
         "- Sleep-EDF uses only two bipolar channels; the FM reports record each architecture's channel adaptation and should be treated as a montage-stress test.",
         "- Exact Wilcoxon p-values are paired by seed for true vs shuffled best validation accuracy.",
     ]

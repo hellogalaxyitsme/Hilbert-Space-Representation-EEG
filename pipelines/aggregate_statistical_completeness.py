@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit paper-facing statistical coverage and add missing paired tests/CIs."""
+"""Summarize statistical coverage and calculate paired tests and confidence intervals."""
 
 from __future__ import annotations
 
@@ -312,17 +312,17 @@ def write_summary(
         f"- `{out_dir / 'cka_rsa_correlation_bootstrap_ci.csv'}`",
         f"- `{out_dir / 'subject_odi_correlation_bootstrap_ci.csv'}`",
         "",
-        "## Coverage Status",
+        "## Statistical coverage",
         "",
         "| Statistical family | Status | Notes |",
         "| --- | --- | --- |",
-        f"| Supervised DL true-vs-shuffled paired tests | complete | {len(supervised_rows)} Wilcoxon rows; corrected/effect-size rows included in paper statistics. |",
-        f"| Frozen-FM true-vs-shuffled paired tests | complete | {len(fm_rows)} Wilcoxon rows; corrected/effect-size rows included in paper statistics. |",
-        f"| Combined paper corrected/effect-size table | complete | {len(paper_rows)} rows with Holm, BH, paired dz, and signed rank-biserial. |",
-        f"| Supervised dynamics correlation CIs | complete | {len(corr_rows)} seed-trajectory bootstrap CI rows. |",
-        f"| Classical EEG baselines | now complete | {len(classical)} paired true-vs-shuffled tests added here. |",
-        f"| CKA/RSA vs HSDD correlation summaries | now CI-backed exploratory | {len(cka_ci)} bootstrap CI rows added here. |",
-        f"| BCI subject-level ODI correlations | now CI-backed exploratory | {len(subject_ci)} bootstrap CI rows added here. |",
+        f"| Supervised DL true-vs-shuffled paired tests | available | {len(supervised_rows)} Wilcoxon rows; corrected/effect-size rows included in the correction table. |",
+        f"| Frozen-FM true-vs-shuffled paired tests | available | {len(fm_rows)} Wilcoxon rows; corrected/effect-size rows included in the correction table. |",
+        f"| Combined corrected/effect-size table | available | {len(paper_rows)} rows with Holm, BH, paired dz, and signed rank-biserial. |",
+        f"| Supervised dynamics correlation CIs | available | {len(corr_rows)} seed-trajectory bootstrap CI rows. |",
+        f"| Classical EEG baselines | available | {len(classical)} paired true-vs-shuffled tests added here. |",
+        f"| CKA/RSA vs HSDD correlation summaries | available exploratory | {len(cka_ci)} bootstrap CI rows added here. |",
+        f"| BCI subject-level ODI correlations | available exploratory | {len(subject_ci)} bootstrap CI rows added here. |",
         "",
         "## Classical Baseline Paired Tests",
         "",

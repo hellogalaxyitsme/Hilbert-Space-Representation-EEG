@@ -451,8 +451,8 @@ def main() -> None:
     maximum = max(max(row["raw_abs_error"], row["anchor_abs_error"]) for row in sanity)
     # Captured convolutional feature maps may differ slightly between batch sizes
     # on CUDA float32 kernels.  This threshold is set above the observed
-    # endpoint discrepancy and is recorded with the output rather than treated
-    # as exact arithmetic equivalence.
+    # endpoint discrepancy and is documented with the output as a finite-precision
+    # comparison.
     if maximum > 2e-4:
         raise AssertionError(f"batched/single difference {maximum} exceeds float32 tolerance")
     started = time.time()

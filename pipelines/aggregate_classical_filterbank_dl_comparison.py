@@ -299,7 +299,7 @@ def main() -> None:
         "",
         "## Interpretation",
         "",
-        "- This is a cross-task classical EEG anchor, not a replacement for BCI IV 2a FBCSP. CSP remains the stronger motor-imagery-specific baseline.",
+        "- This cross-task classical EEG anchor complements BCI IV 2a FBCSP. CSP remains the stronger motor-imagery-specific baseline.",
         "- The filter-bank baseline asks whether DL layers resemble classical band-power geometry on sleep staging, emotion recognition, and P300 detection.",
         "- Collapse-factor values are included in CSVs for completeness but are retained as scale-ratio context alongside ODI and distance-preservation metrics.",
     ]

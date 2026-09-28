@@ -296,7 +296,7 @@ def write_summary(out_dir: Path, payloads: dict[str, dict[str, Any]]) -> None:
         )
     lines += [
         "",
-        "The `robust_checkpoint` scheme is exploratory because it is derived from previous robustness endpoints; it is a diagnostic for target validity, not a clean primary causal test unless nested inside a new training-only selection protocol.",
+        "The `robust_checkpoint` scheme derives from previous robustness endpoints and evaluates target validity under that scope. A primary causal test requires a new training-only selection protocol.",
         "",
         f"Layer target values: `{csv_path}`.",
     ]

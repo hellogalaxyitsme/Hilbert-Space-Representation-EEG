@@ -531,18 +531,18 @@ def main() -> None:
         target_reliably_closer = target_closer and finite_float(overall_probe["mean_delta_abs_error_to_taxon_arm4_minus_arm2_ci_high"]) < 0.0
         ratio_tiny = finite_float(reg_ratio_mean) < 0.005
         if endpoint_bad and target_reliably_closer:
-            lines.append("- Arm 4 reliably moves representations toward the requested taxon targets but does not improve robustness. This points to target validity, not mere implementation, as the main failure mode.")
+            lines.append("- Arm 4 reliably moves representations toward the requested taxon targets without a corresponding robustness improvement.")
         elif endpoint_bad and target_closer:
-            lines.append("- Arm 4 is only weakly closer to the requested taxon targets: the mean target-error delta favors arm 4, but the confidence interval crosses zero and only about half of audited layers improve. The current negative result is therefore a mixed optimization/target-validity failure, not a clean causal rejection of the taxonomy.")
+            lines.append("- Arm 4 is only weakly closer to the requested taxon targets: the mean target-error delta favors arm 4, the confidence interval crosses zero, and about half of audited layers improve.")
         elif endpoint_bad and not target_closer:
-            lines.append("- Arm 4 does not reliably reach the taxon targets and also does not improve robustness. The first failure mode is optimization/target-strength, before drawing a conclusion about the taxonomy itself.")
+            lines.append("- Arm 4 does not reliably reach the taxon targets and does not improve robustness in this configuration.")
         if ratio_tiny:
-            lines.append("- The regularizer is very small relative to the task loss, so lambda/schedule sensitivity is the next minimal diagnostic before expanding to other datasets.")
+            lines.append("- The regularizer-to-task-loss ratio is small in this configuration.")
         else:
             lines.append("- The regularizer has non-negligible scale, so the negative endpoint result should be taken seriously for this configuration.")
     lines += [
         "",
-        "Recommended next implementation: run a small lambda/schedule sensitivity on BCI IV 2a before scaling the Tier-3 regularizer to additional datasets.",
+        "The reported diagnostics are limited to the configured BCI IV 2a training settings.",
     ]
     (out_dir / "tier3_diagnostic_summary.md").write_text("\n".join(lines) + "\n")
     print(f"wrote {out_dir}")

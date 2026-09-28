@@ -310,7 +310,7 @@ def main() -> None:
         "",
         "## Interpretation",
         "",
-        "- FBCSP is an EEG-literature baseline representation, not a neural network layer.",
+        "- FBCSP provides an EEG-literature baseline representation and is evaluated as a feature-space baseline.",
         "- `fbcsp_concat` is the concatenated log-variance CSP feature space across the filter bank.",
         "- `lda_logits` is included as the supervised classifier space downstream of CSP.",
         "- The same HSDD metrics used for DL layers are applied here, so CSP can anchor whether DL layers are preserving, discarding, or reorganizing classical EEG band-power geometry.",

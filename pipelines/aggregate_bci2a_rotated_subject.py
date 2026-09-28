@@ -203,7 +203,7 @@ def main() -> None:
     lines = [
         "# BCI IV 2a Rotated Held-Out Subject Robustness",
         "",
-        "This is a robustness extension, separate from the main six-seed production matrix.",
+        "This robustness extension evaluates rotated held-out training subjects alongside the six-seed analysis.",
         "",
         "Artifacts:",
         "",
@@ -238,7 +238,7 @@ def main() -> None:
         "## Interpretation",
         "",
         "- These runs test whether BCI IV 2a conclusions survive rotating the held-out training subject instead of relying only on A09T.",
-        "- Because this extension is intentionally smaller than the production matrix, use it as robustness evidence, not as the main effect-size table.",
+        "- This extension evaluates robustness across rotated held-out training subjects; its effect estimates are reported separately from the six-seed analysis.",
     ]
     (out_dir / "bci2a_rotated_subject_summary.md").write_text("\n".join(lines) + "\n")
     print(f"wrote {out_dir}", flush=True)

@@ -3,8 +3,8 @@
 
 The demo asks a practical question:
 
-Given only early-checkpoint geometry summaries, can we choose which architecture
-to keep training for a dataset/seed and recover close to the oracle final model?
+Given only early-checkpoint geometry summaries, can we select an architecture
+for a dataset/seed and compare its future validation accuracy with an oracle reference?
 
 It compares HSDD feature sets against CKA/RSA and early validation accuracy.
 """
@@ -416,9 +416,9 @@ def write_markdown(path: Path, summary: list[dict[str, object]], feature_counts:
             "",
             "## Interpretation",
             "",
-            "- A useful HSDD selector should beat the random architecture expectation and reduce regret toward the oracle.",
-            "- If `hsdd` beats `cka_rsa`, the utility case is that EEG-specific geometry contains model-selection signal beyond generic representational similarity.",
-            "- If `early_val_hsdd` beats `early_val`, HSDD adds practical information even when a small labeled validation set is available.",
+            "- Compare selected, random, and oracle-reference accuracies together with regret and hit rate.",
+            "- Differences between `hsdd` and `cka_rsa` summarize the information carried by their respective feature sets.",
+            "- Differences between `early_val_hsdd` and `early_val` quantify the contribution of the added geometry features at the selected checkpoint.",
             "- The stricter `leave_dataset_out` protocol is the transfer-prediction version: it asks whether rules learned on other EEG tasks generalize to a new dataset.",
             "",
             "## Feature Counts",

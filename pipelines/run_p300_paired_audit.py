@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 """Recompute fixed-hook P300 raw and anchored checkpoint measures.
 
-The command needs a locally reconstructed public BNCI 2014-009 cache and
+The command needs a locally prepared public BNCI 2014-009 cache and
 compatible locally held checkpoints. Neither is distributed in this archive.
 It uses the same 64 fixed class-balanced held-out windows for every available
 architecture, seed, and checkpoint, and retains every declared fixed hook.

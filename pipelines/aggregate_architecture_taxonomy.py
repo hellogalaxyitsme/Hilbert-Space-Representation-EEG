@@ -349,7 +349,7 @@ def main() -> None:
             "## Interpretation",
             "",
             "- TSception is best treated as a multi-branch fusion-induced reorganization family. Its temporal multi-scale blocks are comparatively moderate and stable, while spatial/fusion/classifier groups begin with high ODI and usually decrease during true-label training. This matches the design goal of combining multi-scale temporal features with spatial/asymmetry fusion.",
-            "- ATCNet is a hybrid family, not simply another transformer-like collapse case. Its convolutional projection starts at low ODI and consistently increases, while its attention and TCN groups start high and usually decrease or reorganize. This gives ATCNet a two-stage HSDD signature: local convolutional collapse plus attention/TCN reorganization.",
+            "- ATCNet is a hybrid family. Its convolutional projection starts at low ODI and consistently increases, while its attention and TCN groups start high and usually decrease or reorganize. This gives ATCNet a two-stage HSDD signature: local convolutional collapse plus attention/TCN reorganization.",
             "- Sleep-EDF full is included as the only Sleep-EDF dataset scope. The older Sleep-EDF pilot subset is archived and excluded from this reported-scope taxonomy.",
         ]
     )

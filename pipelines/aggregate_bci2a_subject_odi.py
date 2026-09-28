@@ -401,10 +401,10 @@ def write_markdown(
             "",
             "## Interpretation",
             "",
-            "- This is a subject-level utility/diagnostic analysis, not a new training run.",
+            "- This subject-level utility and diagnostic analysis uses the existing training results.",
             "- Positive ODI/accuracy correlation means subjects with larger layer-wise band-subspace mixing at that checkpoint tend to have higher accuracy.",
             "- Negative correlation means lower ODI, i.e. stronger preservation/separation of frequency-band directions, is associated with better subject accuracy.",
-            "- Because subjects `A01T`-`A08T` contributed to training and `A09T` is the held-out subject, cross-subject correlations should be interpreted as heterogeneity diagnostics rather than clean generalization estimates.",
+            "- Subjects `A01T`-`A08T` contributed to training and `A09T` is held out; these cross-subject correlations quantify heterogeneity within this split. Separate held-out evaluations estimate generalization.",
         ]
     )
     path.write_text("\n".join(lines) + "\n")

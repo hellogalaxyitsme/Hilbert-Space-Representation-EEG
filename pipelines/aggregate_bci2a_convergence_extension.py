@@ -101,7 +101,7 @@ def main() -> None:
         )
     lines += [
         "",
-        "Literature-comparability note: this is a strict cross-subject split, not within-subject/session-wise evaluation; manuscript comparisons must cite cross-subject BCI IV 2a numbers rather than within-subject leaderboard values.",
+        "Evaluation scope: this is a strict cross-subject split; results should be compared with evaluations that use the same split type.",
     ]
     (out_dir / "bci2a_convergence_extension_summary.md").write_text("\n".join(lines) + "\n")
     print(f"wrote {out_dir}")

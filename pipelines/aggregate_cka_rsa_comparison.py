@@ -259,7 +259,7 @@ def write_markdown(path: Path, rows: list[dict[str, Any]], corr_rows: list[dict[
             "- Label-RSA is complementary: it asks whether layer distances increasingly separate labels, regardless of preserving raw EEG geometry.",
             "- HSDD's pairwise distance Spearman overlaps most directly with input-RSA, but HSDD also reports scale-adjusted metric distortion.",
             "- HSDD's ODI has no direct CKA/RSA equivalent here: it measures whether canonical EEG frequency-band components remain orthogonal or collapse/mix after a layer.",
-            "- Evidence for the paper is strongest when label-sensitive validation gains align with HSDD geometry changes while CKA/RSA stay flat or only describe global similarity.",
+            "- Interpret metric trajectories jointly with their recorded validation-accuracy associations and analysis scope.",
         ]
     )
     path.write_text("\n".join(lines) + "\n")
