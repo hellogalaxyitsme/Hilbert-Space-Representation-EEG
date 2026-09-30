@@ -1,5 +1,5 @@
 {
-  "historical_csv": "C:\\Users\\Shriya\\Desktop\\EEG Hilbert Space\\submission_work\\audit_results\\seediv_paired_raw_anchored_seed41_64.csv",
+  "historical_csv": "results/seediv_paired_raw_anchored_seed41_64.csv",
   "historical_rows": 68,
   "new_seed41_endpoint_rows": 68,
   "matched_rows": 68,
