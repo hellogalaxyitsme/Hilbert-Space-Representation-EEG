@@ -75,6 +75,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--archs", default="eegnet,shallowconvnet,eegconformer,tsception,atcnet")
     parser.add_argument("--seeds", default="41,42,43,44,45,46")
     parser.add_argument("--per-class", type=int, default=None, help="Held-out windows per class (default 16 for BCI, 13 for Sleep-EDF).")
+    parser.add_argument("--participant-disjoint", action="store_true",  # used with --dataset sleepedf_full
+                        help="Sleep-EDF: evaluate only held-out recordings of participants absent from training.")
     parser.add_argument("--batch-windows", type=int, default=8)
     parser.add_argument("--eps", type=float, default=1e-12)
     return parser.parse_args()
@@ -94,8 +96,37 @@ def recorded_accuracy(report: Path) -> dict[int, float]:
     return {int(item["epoch"]): float(item["val_acc"]) for item in payload["audits"]}
 
 
-def load_heldout(dataset: str, project: Path, ckpt_args: dict, mode: str, seed: int, bci_root: Path | None = None):
+def participant(recording: str) -> str:
+    """Sleep-EDF participant code, e.g. SC463 for SC4632E0-PSG.edf."""
+    return recording[:5]
+
+
+def load_disjoint_sleep(project: Path, ckpt_args: dict, seed: int):
+    """Class-balanced held-out set restricted to participants with no training recording."""
+    from train_sleepedf_arch_layer_audit import balanced_indices
+
+    cache = Path(ckpt_args["cache"])
+    cache = cache if cache.is_absolute() else project / cache
+    data = np.load(cache, allow_pickle=True)
+    rid = data["recording_id"].astype(np.int64)
+    names = [str(v) for v in data["recording_names"]]
+    y = data["y"].astype(np.int64)
+    unique = sorted(set(rid.tolist()))
+    n_val = int(ckpt_args["val_recordings"])
+    train_participants = {participant(names[i]) for i in unique[:-n_val]}
+    keep = [i for i in unique[-n_val:] if participant(names[i]) not in train_participants]
+    pool = np.flatnonzero(np.isin(rid, keep))
+    idx = pool[balanced_indices(y[pool], int(ckpt_args["max_val_per_class"]), seed)]
+    x = data["x"][idx].astype(np.float32)
+    return x, y[idx], float(data["sfreq"][0]), [names[i] for i in keep]
+
+
+def load_heldout(dataset: str, project: Path, ckpt_args: dict, mode: str, seed: int, bci_root: Path | None = None,
+                 participant_disjoint: bool = False):
     """Return held-out arrays exactly as constructed by the training script."""
+    if participant_disjoint:
+        x, y, sfreq, _ = load_disjoint_sleep(project, ckpt_args, seed)
+        return x, y, sfreq
     if dataset == "bci2a":
         from train_eegnet_bci2a_layer_audit import load_bci2a, make_train_val
 
@@ -161,11 +192,12 @@ def main() -> None:
                 if int(ckpt_args.get("seed", seed)) != seed:
                     raise ValueError(f"{ckpt_path} was trained with seed {ckpt_args.get('seed')}, expected {seed}")
                 if seed not in heldout_cache:
-                    heldout_cache[seed] = load_heldout(args.dataset, args.project, ckpt_args, args.label_mode, seed, args.bci_root)
+                    heldout_cache[seed] = load_heldout(args.dataset, args.project, ckpt_args, args.label_mode, seed, args.bci_root,
+                                                       args.participant_disjoint)
                 val_x, val_y, sfreq = heldout_cache[seed]
                 if picked is None:
                     ref_x, ref_y, _ = heldout_cache[seed] if seed == 41 else load_heldout(
-                        args.dataset, args.project, ckpt_args, args.label_mode, 41, args.bci_root)
+                        args.dataset, args.project, ckpt_args, args.label_mode, 41, args.bci_root, args.participant_disjoint)
                     rng = np.random.default_rng(41)
                     idx = []
                     for label in sorted(set(ref_y.tolist())):
@@ -177,12 +209,15 @@ def main() -> None:
                     (args.out / "selection.json").write_text(json.dumps({
                         "dataset": args.dataset, "per_class": per_class, "n_windows": int(len(picked)),
                         "heldout_indices": picked.tolist(), "labels": ref_y[picked].tolist(), "sfreq": sfreq,
+                        "participant_disjoint": bool(args.participant_disjoint),
                         "rng": "numpy.default_rng(41), per class choice without replacement, sorted"}, indent=2), encoding="utf-8")
                 n_outputs = int(len(np.unique(val_y)))
                 model, layers, _ = build_model(args.dataset, arch, val_x.shape[1], val_x.shape[2], n_outputs, sfreq)
                 model.load_state_dict(ckpt["model_state_dict"], strict=True)
                 model.to(device).eval()
                 recomputed = accuracy(model, val_x, val_y, device)
+                if args.participant_disjoint:
+                    recorded[epoch] = recomputed  # no training-time value exists for this evaluation set
                 names = tuple(n for n in FIXED_HOOKS[arch] if n in layers or n == "logits")
                 capture = LayerCapture(model, names)
                 per_layer = {n: [] for n in names}

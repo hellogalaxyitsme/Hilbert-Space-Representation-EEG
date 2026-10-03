@@ -47,7 +47,8 @@ def read_measurements(path: Path, dataset: str, mode: str) -> pd.DataFrame:
     return frame
 
 
-def load_anchored() -> pd.DataFrame:
+def load_anchored(sleep_records: str = "sleepedf_full") -> pd.DataFrame:
+    """Representative-layer measurements; ``sleep_records`` selects the Sleep-EDF evaluation set."""
     seed_iv = pd.read_csv(RES / "seediv" / "fixed_hook_seed_layer_checkpoint_summary.csv").rename(columns={
         "baseline_sq_over_raw_den": "baseline", "cross_over_raw_den": "cross", "residual_dot_over_raw_den": "residual"})
     seed_iv["dataset"], seed_iv["label_mode"] = "seediv", "true"
@@ -57,7 +58,8 @@ def load_anchored() -> pd.DataFrame:
     frames = [seed_iv]
     for mode in ("true", "shuffled"):
         for task in ("p300", "bci2a", "sleepedf_full"):
-            frames.append(read_measurements(RECORDS / f"{task}_{mode}" / "layer_summary.csv", task, mode))
+            source = sleep_records if task == "sleepedf_full" else task
+            frames.append(read_measurements(RECORDS / f"{source}_{mode}" / "layer_summary.csv", task, mode))
     cols = ["dataset", "label_mode", "arch", "layer", "seed", "epoch", "val_acc",
             "raw_odi", "anchored_odi", "baseline", "cross", "residual"]
     data = pd.concat([f[cols] for f in frames], ignore_index=True)
@@ -111,19 +113,35 @@ def endpoint_changes(data: pd.DataFrame) -> pd.DataFrame:
     return delta
 
 
-def coupling(data: pd.DataFrame) -> pd.DataFrame:
+def coupling(data: pd.DataFrame, cols=(("raw_odi", "r_raw"), ("anchored_odi", "r_anch"))) -> pd.DataFrame:
+    """Pearson correlation between ODI and held-out accuracy across training epochs, per layer trajectory."""
     rows = []
     for key, g in data[data.label_mode == "true"].groupby(KEY + ["operation_group"]):
         g = g.sort_values("epoch")
         if len(g) < 3 or g.val_acc.std() < 1e-12:
             continue
         rec = dict(zip(KEY + ["operation_group"], key))
-        for col, name in (("raw_odi", "r_raw"), ("anchored_odi", "r_anch")):
+        for col, name in cols:
             rec[name] = np.corrcoef(g[col], g.val_acc)[0, 1] if g[col].std() > 1e-12 else np.nan
         rows.append(rec)
     out = pd.DataFrame(rows).dropna()
-    out["agree"] = np.sign(out.r_raw) == np.sign(out.r_anch)
+    if {"r_raw", "r_anch"} <= set(out.columns):
+        out["agree"] = np.sign(out.r_raw) == np.sign(out.r_anch)
     return out
+
+
+def all_layer_table(sleep_accuracy: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Raw ODI at every recorded layer (true labels), optionally with Sleep-EDF accuracy replaced."""
+    joined = pd.read_csv(RES / "taxonomy" / "joined_layer_checkpoint_metrics.csv")
+    j = joined[(joined["mode"] == "true") & ~((joined.dataset == "p300") & (joined.arch == "atcnet"))].copy()
+    if sleep_accuracy is not None:
+        sleep = j.dataset == "sleepedf_full"
+        acc = sleep_accuracy.set_index(["arch", "seed", "epoch"]).val_acc
+        j.loc[sleep, "val_acc"] = [acc[(a, s, e)] for a, s, e in zip(j.loc[sleep, "arch"], j.loc[sleep, "seed"], j.loc[sleep, "epoch"])]
+    groups = pd.read_csv(RES / "taxonomy" / "architecture_taxonomy_layer_rows.csv")[["arch", "layer", "operation_group"]].drop_duplicates()
+    j = j.merge(groups, on=["arch", "layer"], how="left").rename(columns={"hsdd_odi": "raw_odi"})
+    j["label_mode"] = "true"
+    return j
 
 
 def transfer(coup: pd.DataFrame, col: str, tasks: list[str]) -> pd.DataFrame:
@@ -145,15 +163,97 @@ def transfer(coup: pd.DataFrame, col: str, tasks: list[str]) -> pd.DataFrame:
     return pd.concat(rows, ignore_index=True)
 
 
-def summarize_transfer(tr: pd.DataFrame) -> dict:
-    return {
-        "taxonomy": run_bootstrap(tr, lambda f: task_mean(f, "tax_correct")),
-        "majority": run_bootstrap(tr, lambda f: task_mean(f, "maj_correct")),
-        "difference": run_bootstrap(tr, lambda f: task_mean(f, "tax_correct") - task_mean(f, "maj_correct")),
+def summarize_transfer(coup: pd.DataFrame, col: str, tasks: list[str]) -> tuple[dict, pd.DataFrame]:
+    """Leave-one-task-out sign accuracy with intervals that refit both rules in every bootstrap draw.
+
+    Accuracy is averaged over trajectories within each held-out task and then over tasks with equal
+    weight. Each draw resamples trained networks (task, architecture, seed) within each task, refits the
+    architecture-specific and majority rules on the resampled training tasks and scores the resampled
+    held-out task.
+    """
+    coup = coup[coup.dataset.isin(tasks)]
+    tr = transfer(coup, col, tasks)
+
+    def scores(frame):
+        t = transfer(frame, col, tasks)
+        return task_mean(t, "tax_correct"), task_mean(t, "maj_correct")
+
+    rng = np.random.default_rng(RNG_SEED)
+    runs = [[g for _, g in part.groupby(["dataset", "arch", "seed"])] for _, part in coup.groupby("dataset")]
+    draws = np.empty((DRAWS, 2))
+    for i in range(DRAWS):
+        parts = []
+        for groups in runs:
+            parts.extend(groups[j] for j in rng.integers(0, len(groups), len(groups)))
+        draws[i] = scores(pd.concat(parts, ignore_index=True))
+    tax, maj = task_mean(tr, "tax_correct"), task_mean(tr, "maj_correct")
+
+    def interval(est, values):
+        return [float(est), float(np.quantile(values, 0.025)), float(np.quantile(values, 0.975))]
+
+    summary = {
+        "taxonomy": interval(tax, draws[:, 0]),
+        "majority": interval(maj, draws[:, 1]),
+        "difference": interval(tax - maj, draws[:, 0] - draws[:, 1]),
         "n": int(len(tr)),
         "by_task": {d: {"taxonomy": float(g.tax_correct.mean()), "majority": float(g.maj_correct.mean()), "n": int(len(g)),
                         "majority_sign": int(g.majority_sign.iloc[0])} for d, g in tr.groupby("dataset")},
     }
+    return summary, tr
+
+
+def participant_disjoint_sensitivity(original: pd.DataFrame) -> dict:
+    """Repeat the Sleep-EDF summaries on held-out recordings of participants absent from training."""
+    data = load_anchored("sleepedf_full_disjoint")
+    sleep = data[data.dataset == "sleepedf_full"]
+    out: dict[str, object] = {}
+    windows = json.loads((RECORDS / "sleepedf_full_disjoint_true" / "selection.json").read_text(encoding="utf-8"))
+    out["windows"] = int(windows["n_windows"])
+
+    end = sleep[sleep.epoch == sleep.final_epoch].groupby(["label_mode", "arch", "seed"]).val_acc.first().unstack(0)
+    out["accuracy"] = {a: {"true": float(g["true"].mean()), "shuffled": float(g["shuffled"].mean())} for a, g in end.groupby(level=0)}
+    out["min_seed_margin"] = float((end["true"] - end["shuffled"]).min())
+    orig = original[(original.dataset == "sleepedf_full") & (original.epoch == original.final_epoch)]
+    orig = orig.groupby(["label_mode", "arch", "seed"]).val_acc.first().unstack(0)
+    out["accuracy_original"] = {a: {"true": float(g["true"].mean()), "shuffled": float(g["shuffled"].mean())} for a, g in orig.groupby(level=0)}
+
+    keys = ["label_mode", "arch", "layer", "seed", "epoch"]
+    both = sleep.merge(original[original.dataset == "sleepedf_full"], on=keys, suffixes=("", "_orig"))
+    out["agreement_with_original"] = {c: float(stats.pearsonr(both[c], both[c + "_orig"])[0]) for c in ("raw_odi", "anchored_odi", "baseline")}
+
+    st = sleep[(sleep.label_mode == "true") & ~sleep.far_anchor]
+    out["baseline_median"] = {k: float(v) for k, v in st.groupby(st.arch.isin(ATTENTION).map({True: "attention_fusion", False: "compact_conv"})).baseline.median().items()}
+
+    delta = endpoint_changes(data)
+    dt = delta[delta.label_mode == "true"]
+    out["opposite_pooled"] = run_bootstrap(dt, lambda f: f.opposite.mean())
+    out["opposite_sleep"] = float(dt[dt.dataset == "sleepedf_full"].opposite.mean())
+    out["opposite_sleep_original"] = float(endpoint_changes(original).query("label_mode == 'true' and dataset == 'sleepedf_full'").opposite.mean())
+
+    coup = coupling(data)
+    out["coupling_agreement"] = float(coup.agree.mean())
+    out["coupling_agreement_sleep"] = float(coup[coup.dataset == "sleepedf_full"].agree.mean())
+    for col, name in (("r_raw", "raw"), ("r_anch", "anchored")):
+        out[f"transfer_{name}_four"], _ = summarize_transfer(coup, col, TASKS)
+    sleep_acc = pd.read_csv(RECORDS / "sleepedf_full_disjoint_true" / "accuracy_checks.csv").rename(columns={"recomputed_val_acc": "val_acc"})
+    coup_all = coupling(all_layer_table(sleep_acc[["arch", "seed", "epoch", "val_acc"]]), cols=(("raw_odi", "r_raw"),))
+    out["transfer_all_layers_four"], _ = summarize_transfer(coup_all, "r_raw", TASKS)
+
+    labelled = data[data.dataset.isin(LABELLED_TASKS)]
+    dl = delta[delta.dataset.isin(LABELLED_TASKS)]
+    for col, name in (("anchored_odi", "anchored"), ("raw_odi", "raw")):
+        lw = dl.pivot_table(index=KEY, columns="label_mode", values=col).dropna().groupby(level=[0, 1, 2]).mean()
+        out[f"{name}_change_true_vs_shuffled"] = {
+            "layers": int(len(lw)), "sign_agreement": float((np.sign(lw["true"]) == np.sign(lw["shuffled"])).mean()),
+            "ratio": float((lw["true"] - lw["shuffled"]).abs().mean() / lw["true"].abs().mean())}
+    per_seed = labelled.groupby(["dataset", "label_mode", "arch", "seed", "epoch"]).anchored_odi.mean().reset_index()
+    per_seed = per_seed[per_seed.epoch == per_seed.groupby("dataset").epoch.transform("max")]
+    wide = per_seed.pivot_table(index=["dataset", "arch", "seed"], columns="label_mode", values="anchored_odi").dropna()
+    diff = wide["true"] - wide["shuffled"]
+    out["label_control"] = {a: {"pairs": int(len(d)), "positive": int((d > 0).sum()),
+                                "sleep_mean": float(d.xs("sleepedf_full", level="dataset").mean())}
+                            for a, d in diff.groupby(level="arch")}
+    return out
 
 
 def main() -> None:
@@ -241,11 +341,17 @@ def main() -> None:
     s["coupling_agreement_by_task_arch"] = {f"{d}/{a}": float(g.agree.mean()) for (d, a), g in coup.groupby(["dataset", "arch"])}
     s["coupling_mean_r_by_task_arch"] = {f"{d}/{a}": {"raw": float(g.r_raw.mean()), "anchored": float(g.r_anch.mean())}
                                          for (d, a), g in coup.groupby(["dataset", "arch"])}
+    three = [t for t in TASKS if t != "sleepedf_full"]
     for col, name in (("r_raw", "raw"), ("r_anch", "anchored")):
-        for tasks, label in ((TASKS, "four"), ([t for t in TASKS if t != "sleepedf_full"], "three")):
-            tr = transfer(coup, col, tasks)
+        for tasks, label in ((TASKS, "four"), (three, "three")):
+            s[f"transfer_{name}_{label}"], tr = summarize_transfer(coup, col, tasks)
             tr.to_csv(OUT / f"cross_task_transfer_{name}_{label}.csv", index=False)
-            s[f"transfer_{name}_{label}"] = summarize_transfer(tr)
+    # The same procedure for raw ODI at every recorded layer.
+    coup_all = coupling(all_layer_table(), cols=(("raw_odi", "r_raw"),))
+    coup_all.to_csv(OUT / "accuracy_coupling_all_layers.csv", index=False)
+    for tasks, label in ((TASKS, "four"), (three, "three")):
+        s[f"transfer_all_layers_{label}"], tr = summarize_transfer(coup_all, "r_raw", tasks)
+        tr.to_csv(OUT / f"cross_task_transfer_all_layers_{label}.csv", index=False)
 
     # Label control: true versus shuffled labels with shared initialization.
     labelled = data[data.dataset.isin(LABELLED_TASKS)]
@@ -286,14 +392,19 @@ def main() -> None:
                            "task_means": {d: float(v) for d, v in da.groupby(level="dataset").mean().items()}}
         seed_level[label] = entry
     s["label_control_seed_level"] = seed_level
+    # True-versus-shuffled comparisons use only (task, architecture, layer, seed) present in both conditions.
     dl = delta[delta.dataset.isin(LABELLED_TASKS)]
+    both = dl.groupby(KEY).label_mode.nunique()
+    dl = dl.set_index(KEY).loc[both[both == 2].index].reset_index()
+    s["label_control_matched_trajectories"] = int(len(dl) // 2)
+    matched_rows = labelled.groupby(KEY + ["epoch"]).label_mode.transform("nunique") == 2
     s["opposite_by_label_mode"] = {m: run_bootstrap(g, lambda f: f.opposite.mean()) for m, g in dl.groupby("label_mode")}
     s["opposite_by_label_mode_task"] = {f"{m}/{d}": float(g.opposite.mean()) for (m, d), g in dl.groupby(["label_mode", "dataset"])}
     s["opposite_eegconformer_by_label_mode"] = {m: float(g[g.arch == "eegconformer"].opposite.mean()) for m, g in dl.groupby("label_mode")}
-    s["baseline_median_by_label_mode"] = {m: float(g.baseline.median()) for m, g in labelled.groupby("label_mode")}
+    s["baseline_median_by_label_mode"] = {m: float(g.baseline.median()) for m, g in labelled[matched_rows].groupby("label_mode")}
     # Layerwise anchored change, true versus shuffled, in the held-out analysis.
     for col, name in (("anchored_odi", "anchored"), ("raw_odi", "raw")):
-        lw = dl.groupby(["dataset", "arch", "layer", "label_mode"])[col].mean().unstack("label_mode").dropna()
+        lw = dl.pivot_table(index=KEY, columns="label_mode", values=col).dropna().groupby(level=[0, 1, 2]).mean()
         lw.to_csv(OUT / f"{name}_change_true_vs_shuffled.csv")
         s[f"{name}_change_true_vs_shuffled"] = {
             "layers": int(len(lw)), "pearson": float(stats.pearsonr(lw["true"], lw["shuffled"])[0]),
@@ -330,7 +441,8 @@ def main() -> None:
     ends["point"] = np.where(ends.epoch == 0, "start", "end")
     wide = ends.pivot_table(index=["dataset", "arch", "layer", "mode", "seed"], columns="point", values="hsdd_odi")
     wide["change"] = wide["end"] - wide["start"]
-    hook_change = wide.groupby(["dataset", "arch", "layer", "mode"]).change.mean().unstack("mode").dropna()
+    paired = wide.change.unstack("mode").dropna()  # seeds present in both label conditions
+    hook_change = paired.groupby(level=["dataset", "arch", "layer"]).mean()
     hook_change.to_csv(OUT / "four_task_raw_change_true_vs_shuffled.csv")
     s["four_task_raw_change_true_vs_shuffled"] = {
         "hooks": int(len(hook_change)), "pearson": float(stats.pearsonr(hook_change["true"], hook_change["shuffled"])[0]),
@@ -355,6 +467,8 @@ def main() -> None:
     by_arch["opposite"] = pd.DataFrame(per_arch).set_index("arch").opposite
     by_arch["coupling_agreement"] = pd.Series(s["coupling_agreement_by_arch"])
     by_arch.reindex(ARCH_ORDER).to_csv(OUT / "baseline_by_architecture.csv")
+    if (RECORDS / "sleepedf_full_disjoint_shuffled" / "layer_summary.csv").exists():
+        s["sleep_participant_disjoint"] = participant_disjoint_sensitivity(data)
     (RECORDS / "statistics.json").write_text(json.dumps(s, indent=2, default=float) + "\n", encoding="utf-8")
     print(json.dumps({k: s[k] for k in ("scope", "accuracy_recomputation", "baseline_median_by_family_excluding_far",
                                          "opposite_direction_true", "coupling_sign_agreement")}, indent=1, default=float))

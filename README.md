@@ -44,6 +44,9 @@ python anchored/run_anchored_heldout.py --dataset bci2a --project path/to/projec
 python anchored/run_anchored_heldout.py --dataset sleepedf_full --project path/to/project \
     --label-mode true --out results/anchored/sleepedf_full_true
 # (repeat with --label-mode shuffled)
+# Sleep-EDF evaluated only on held-out recordings of participants without training recordings
+python anchored/run_anchored_heldout.py --dataset sleepedf_full --project path/to/project \
+    --label-mode true --participant-disjoint --out results/anchored/sleepedf_full_disjoint_true
 
 # Derived statistics from the included measurements (no EEG data or model parameters needed)
 python anchored/analyses.py
@@ -53,10 +56,11 @@ python anchored/analyses.py
 
 - baseline terms by architecture and task;
 - the direction comparison between raw and anchored ODI, including a minimum-change sensitivity analysis;
-- accuracy coupling and leave-one-task-out prediction of its sign;
-- the true- versus shuffled-label comparison.
+- accuracy coupling and leave-one-task-out prediction of its sign, for raw ODI at all layers and for both indices at the representative layers;
+- the true- versus shuffled-label comparison, restricted to layer trajectories available under both label conditions;
+- a participant-disjoint repetition of every Sleep-EDF summary.
 
-Bootstrap intervals resample trained networks within each task (5,000 draws, seed 2026).
+Bootstrap intervals resample trained networks within each task (5,000 draws, seed 2026). For cross-task prediction, sign accuracy is averaged over trajectories within each held-out task and then over tasks with equal weight, and every bootstrap draw refits both prediction rules.
 
 ## Compact summaries of the all-layer measurements
 
